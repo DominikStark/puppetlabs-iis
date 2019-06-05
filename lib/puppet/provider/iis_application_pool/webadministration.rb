@@ -89,8 +89,10 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
   end
 
   def self.parse_environment_variables(config)
+    Puppet.debug "config #{config}"
     environment_variables_hash = {}
     splitted_config = config.split('[environmentVariables]')
+    Puppet.debug "splitted_config #{splitted_config}"
     if splitted_config.count > 1
       key = nil
       value = nil
@@ -184,6 +186,7 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
       pool_hash[:restart_time_limit]                 = pool['restart_time_limit']
       pool_hash[:restart_schedule]                   = pool['restart_schedule'].to_s.split(' ')
 
+      Puppet.debug "pool_hash #{pool_hash}"
       new(pool_hash)
     end
   end
