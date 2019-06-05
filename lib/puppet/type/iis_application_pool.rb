@@ -126,7 +126,7 @@ Puppet::Type.newtype(:iis_application_pool) do
     desc "Configure environment variables for the application pool."
   end
 
-  newproperty(:test) do
+  newparam(:test) do
     desc "Configure environment variables for the application pool."
   end
 
