@@ -21,7 +21,7 @@ Puppet::Type.newtype(:iis_application_pool) do
     newvalue(:absent) do
       provider.destroy
     end
-    
+
     defaultto :present
   end
 
@@ -141,10 +141,8 @@ Puppet::Type.newtype(:iis_application_pool) do
 
   newproperty(:environment_variables, :parent => PuppetX::PuppetLabs::IIS::Property::Hash) do
     desc "Configure environment variables for the application pool."
-    def insync?(is)
-      should.select do |k,v|
-        is[k] != v
-      end.empty?
+    validate do |value|
+      super value
     end
   end
 
@@ -191,7 +189,7 @@ Puppet::Type.newtype(:iis_application_pool) do
           property is used together with the `cpu_smp_processor_affinity_mask`
           and `cpu_smp_processor_affinity_mask2` properties."
     newvalues(:true, :false)
-       
+
     munge do |value|
       resource.munge_boolean(value)
     end
@@ -217,7 +215,7 @@ Puppet::Type.newtype(:iis_application_pool) do
           second processor. If you set the value to 3 (which corresponds to
           0000000000000011 in binary) the worker processes run on both the
           first and second processors.
-    
+
           Note: Do not set this property to 0. Doing so disables symmetric
           multiprocessing (SMP) affinity and creates an error condition. This
           means that processes running on one CPU will not remain affiliated
@@ -331,7 +329,7 @@ Puppet::Type.newtype(:iis_application_pool) do
 
   newproperty(:pinging_enabled, :boolean => true) do
     newvalues(:true, :false)
-       
+
     munge do |value|
       resource.munge_boolean(value)
     end
