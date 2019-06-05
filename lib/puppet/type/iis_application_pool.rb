@@ -3,6 +3,7 @@ require_relative '../../puppet_x/puppetlabs/iis/property/name'
 require_relative '../../puppet_x/puppetlabs/iis/property/string'
 require_relative '../../puppet_x/puppetlabs/iis/property/positive_integer'
 require_relative '../../puppet_x/puppetlabs/iis/property/timeformat'
+require_relative '../../puppet_x/puppetlabs/iis/property/hash'
 
 Puppet::Type.newtype(:iis_application_pool) do
   @doc = "Allows creation of a new IIS Application Pool and configuration of application pool parameters."
@@ -135,6 +136,15 @@ Puppet::Type.newtype(:iis_application_pool) do
       super value
       fail "#{self.name.to_s} should be greater than 10" unless value.to_i > 10
       fail "#{self.name.to_s} should be less than or equal to 65535" unless value.to_i <= 65535
+    end
+  end
+
+  newproperty(:environment_variables, :parent => PuppetX::PuppetLabs::IIS::Property::Hash) do
+    desc "Configure environment variables for the application pool."
+    def insync?(is)
+      should.select do |k,v|
+        is[k] != v
+      end.empty?
     end
   end
 

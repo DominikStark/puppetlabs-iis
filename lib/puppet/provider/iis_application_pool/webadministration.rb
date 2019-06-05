@@ -31,6 +31,13 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
     @resource.properties.select{|rp| rp.name != :ensure && rp.name != :state}.each do |property|
       property_name = iis_properties[property.name.to_s]
       Puppet.debug "Changing #{property_name} to #{property.value}"
+      if property_name == 'environment_variables'
+        cmd << "%systemroot%\\system32\\inetsrv\\AppCmd.exe set config -section:system.applicationHost/applicationPools /-\"[name='#{@resource[:name]}'].environmentVariables\" /commit:apphost"
+        property.value.each do |key, value|
+          cmd << "%systemroot%\\system32\\inetsrv\\AppCmd.exe set config -section:system.applicationHost/applicationPools /+\"[name='#{@resource[:name]}'].environmentVariables.[name='#{key}',value='#{value}']\" /commit:apphost"
+        end
+        next
+      end
       if property.value.is_a?(Array)
         cmd << "Clear-ItemProperty -Path 'IIS:\\AppPools\\#{@resource[:name]}' -Name '#{property_name}'"
         property.value.each do |item|
@@ -105,6 +112,7 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
       pool_hash[:pass_anonymous_token]          = pool['pass_anonymous_token'].to_s.downcase
       pool_hash[:start_mode]                    = pool['start_mode']
       pool_hash[:queue_length]                  = pool['queue_length']
+      pool_hash[:environment_variables]         = pool['environment_variables']
 
       pool_hash[:cpu_action]                       = pool['cpu_action']
       pool_hash[:cpu_limit]                        = pool['cpu_limit']
@@ -168,6 +176,7 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
       'pass_anonymous_token'          => 'passAnonymousToken',
       'start_mode'                    => 'startMode',
       'queue_length'                  => 'queueLength',
+      'environment_variables'         => 'environment_variables',
 
       # cpu related
       'cpu_action'                       => 'cpu.action',
