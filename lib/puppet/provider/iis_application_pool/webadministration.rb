@@ -30,8 +30,8 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
 
     @resource.properties.select{|rp| rp.name != :ensure && rp.name != :state}.each do |property|
       property_name = iis_properties[property.name.to_s]
-      Puppet.debug "Changing #{property_name} to #{property.value} is this shit working now or what???!!!!!"
-      if property_name == 'queue_length'
+      Puppet.debug "Changing #{property_name} to #{property.value}."
+      if property_name == 'environment_variables'
         cmd << "%systemroot%\\system32\\inetsrv\\AppCmd.exe set config -section:system.applicationHost/applicationPools /-\"[name='#{@resource[:name]}'].environmentVariables\" /commit:apphost"
         property.value.each do |key, value|
           cmd << "%systemroot%\\system32\\inetsrv\\AppCmd.exe set config -section:system.applicationHost/applicationPools /+\"[name='#{@resource[:name]}'].environmentVariables.[name='#{key}',value='#{value}']\" /commit:apphost"
