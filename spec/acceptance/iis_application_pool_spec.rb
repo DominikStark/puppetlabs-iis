@@ -320,6 +320,7 @@ describe 'iis_application_pool' do
       puppet_resource_should_show('pass_anonymous_token', :true)
       puppet_resource_should_show('start_mode','OnDemand')
       puppet_resource_should_show('queue_length','1000')
+      puppet_resource_should_show('test','1000')
       puppet_resource_should_show('cpu_action','NoAction')
       puppet_resource_should_show('cpu_limit','100000')
       puppet_resource_should_show('cpu_reset_interval','00:05:00')

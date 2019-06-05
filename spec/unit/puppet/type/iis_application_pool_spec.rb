@@ -25,6 +25,7 @@ describe 'iis_application_pool' do
       :pass_anonymous_token,
       :start_mode,
       :queue_length,
+      :test,
       :cpu_action,
       :cpu_limit,
       :cpu_reset_interval,
@@ -108,9 +109,9 @@ describe 'iis_application_pool' do
     :logon_type,
     :load_balancer_capabilities,
     :identity_type,
-    
+
   ]
-  
+
   [
     :name,
     :clr_config_file,
@@ -150,7 +151,7 @@ describe 'iis_application_pool' do
       end.to raise_error(Puppet::Error, /Parameter #{property} failed on .*: Invalid value/)
     end
   end
-  
+
   [
     {:cpu_reset_interval => "00:00:00"},
     {:idle_timeout => "00:00:00"},
@@ -164,7 +165,7 @@ describe 'iis_application_pool' do
   ].each do |property|
     prop = property.keys[0]
     upper_limit = property[property.keys[0]]
-    
+
     it "should support #{prop} as a formatted time" do
       config = {name: 'name'}
       config[prop] = upper_limit
@@ -205,7 +206,7 @@ describe 'iis_application_pool' do
     #     type_class.new(config)
     #   end.to raise_error(Puppet::Error, /#{prop} should be greater than 0/)
     # end
-    
+
     if upper_limit
       it "should require #{prop} to be less than #{upper_limit}" do
         expect do
@@ -240,7 +241,7 @@ describe 'iis_application_pool' do
 
     [ 'value', 'value with spaces', 'UPPER CASE', '0123456789_-', 'With.Period' ].each do |value|
       it "should accept '#{value}'" do
-        expect { 
+        expect {
           pool = type_class.new(
             name: 'foo'
           )
