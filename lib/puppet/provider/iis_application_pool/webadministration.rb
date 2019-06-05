@@ -31,7 +31,7 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
     @resource.properties.select{|rp| rp.name != :ensure && rp.name != :state}.each do |property|
       property_name = iis_properties[property.name.to_s]
       Puppet.debug "Changing #{property_name} to #{property.value}"
-      if property_name == 'environment_variables'
+      if property_name == 'queue_length'
         cmd << "%systemroot%\\system32\\inetsrv\\AppCmd.exe set config -section:system.applicationHost/applicationPools /-\"[name='#{@resource[:name]}'].environmentVariables\" /commit:apphost"
         property.value.each do |key, value|
           cmd << "%systemroot%\\system32\\inetsrv\\AppCmd.exe set config -section:system.applicationHost/applicationPools /+\"[name='#{@resource[:name]}'].environmentVariables.[name='#{key}',value='#{value}']\" /commit:apphost"
@@ -70,7 +70,7 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
     result   = self.class.run(inst_cmd)
     Puppet.err "Error destroying apppool: #{result[:errormessage]}" unless result[:exitcode] == 0
     Puppet.err "Error destroying apppool: #{result[:errormessage]}" unless result[:errormessage].nil?
-    
+
     @resource[:ensure]  = :absent
   end
 
@@ -102,7 +102,7 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
       pool_hash[:ensure] = :present
       pool_hash[:name]   = pool['name']
       pool_hash[:state]  = pool['state'].to_s.downcase
-      
+
       pool_hash[:auto_start]                    = pool['auto_start'].to_s.downcase
       pool_hash[:clr_config_file]               = pool['clr_config_file']
       pool_hash[:enable32_bit_app_on_win64]     = pool['enable32_bit_app_on_win64'].to_s.downcase
@@ -160,7 +160,7 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
       new(pool_hash)
     end
   end
-  
+
   private
   def iis_properties
     # most of these are found with appcmd list apppool /text:*
@@ -203,7 +203,7 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
       'startup_time_limit'         => 'processModel.startupTimeLimit',
       'user_name'                  => 'processModel.userName',
       'password'                   => 'processModel.password',
-      
+
       'orphan_action_exe'          => 'failure.orphanActionExe',
       'orphan_action_params'       => 'failure.orphanActionParams',
       'orphan_worker_process'      => 'failure.orphanWorkerProcess',
@@ -226,7 +226,7 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
       'restart_time_limit'                 => 'recycling.periodicRestart.time',
       'restart_schedule'                   => 'recycling.periodicRestart.schedule'
     }
-    
+
     iis_properties
   end
 

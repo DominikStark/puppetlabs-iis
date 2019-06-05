@@ -122,24 +122,7 @@ Puppet::Type.newtype(:iis_application_pool) do
     newvalues(:OnDemand, :AlwaysRunning)
   end
 
-  newproperty(:queue_length, :parent => PuppetX::PuppetLabs::IIS::Property::PositiveInteger) do
-    desc "Indicates to HTTP.sys how many requests to queue for an application
-          pool before rejecting future requests. When the value set for this
-          property is exceeded, IIS rejects subsequent requests with a 503
-          error. If the `load_balancer_capabilities` setting is 'TcpLevel',
-          the connection is closed instead of rejecting requests with a 503.
-          For more information about `load_balancer_capabilities`, see
-          [Failure Settings for an Application
-          Pool](https://www.iis.net/configreference/system.applicationhost/applicationPools/add/failure).
-          Valid options 11 to 65535."
-    validate do |value|
-      super value
-      fail "#{self.name.to_s} should be greater than 10" unless value.to_i > 10
-      fail "#{self.name.to_s} should be less than or equal to 65535" unless value.to_i <= 65535
-    end
-  end
-
-  newproperty(:environment_variables) do
+  newproperty(:queue_length) do
     desc "Configure environment variables for the application pool."
   end
 
