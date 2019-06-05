@@ -112,7 +112,7 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
       pool_hash[:pass_anonymous_token]          = pool['pass_anonymous_token'].to_s.downcase
       pool_hash[:start_mode]                    = pool['start_mode']
       pool_hash[:queue_length]                  = pool['queue_length']
-      pool_hash[:environment_variables]         = pool['environment_variables']
+      pool_hash[:environment_variables]         = {"a"=>"a", "b"=>"b"}
 
       pool_hash[:cpu_action]                       = pool['cpu_action']
       pool_hash[:cpu_limit]                        = pool['cpu_limit']
@@ -176,7 +176,7 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
       'pass_anonymous_token'          => 'passAnonymousToken',
       'start_mode'                    => 'startMode',
       'queue_length'                  => 'queueLength',
-      'environment_variables'         => 'environment_variables',
+      'environment_variables'         => 'environmentVariables',
 
       # cpu related
       'cpu_action'                       => 'cpu.action',
