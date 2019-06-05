@@ -32,9 +32,9 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
       property_name = iis_properties[property.name.to_s]
       Puppet.debug "Changing #{property_name} to #{property.value}."
       if property_name == 'environment_variables'
-        cmd << "%systemroot%\\system32\\inetsrv\\AppCmd.exe set config -section:system.applicationHost/applicationPools /-\"[name='#{@resource[:name]}'].environmentVariables\" /commit:apphost"
+        cmd << "C:\\Windows\\system32\\inetsrv\\AppCmd.exe set config -section:system.applicationHost/applicationPools /-\"[name='#{@resource[:name]}'].environmentVariables\" /commit:apphost"
         property.value.each do |key, value|
-          cmd << "%systemroot%\\system32\\inetsrv\\AppCmd.exe set config -section:system.applicationHost/applicationPools /+\"[name='#{@resource[:name]}'].environmentVariables.[name='#{key}',value='#{value}']\" /commit:apphost"
+          cmd << "C:\\Windows\\system32\\inetsrv\\AppCmd.exe set config -section:system.applicationHost/applicationPools /+\"[name='#{@resource[:name]}'].environmentVariables.[name='#{key}',value='#{value}']\" /commit:apphost"
         end
         next
       end
