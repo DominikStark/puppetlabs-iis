@@ -139,11 +139,8 @@ Puppet::Type.newtype(:iis_application_pool) do
     end
   end
 
-  newproperty(:environment_variables, :parent => PuppetX::PuppetLabs::IIS::Property::Hash) do
+  newproperty(:environment_variables) do
     desc "Configure environment variables for the application pool."
-    validate do |value|
-      super value
-    end
   end
 
   newproperty(:cpu_action) do
