@@ -143,6 +143,10 @@ Puppet::Type.newtype(:iis_application_pool) do
     desc "Configure environment variables for the application pool."
   end
 
+  newproperty(:test) do
+    desc "Configure environment variables for the application pool."
+  end
+
   newproperty(:cpu_action) do
     desc "Configures the action that IIS takes when a worker process exceeds its
           configured CPU limit."
