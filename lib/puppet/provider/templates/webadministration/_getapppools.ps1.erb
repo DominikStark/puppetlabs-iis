@@ -2,7 +2,7 @@ Get-WebConfiguration -Filter '/system.applicationHost/applicationPools/add' | % 
   New-Object -TypeName PSObject -Property @{
     name  = [string]$_.name
     state = [string]$_.state
-    
+
     auto_start                    = [string]$_.autostart
     clr_config_file               = [string]$_.clrconfigfile
     enable32_bit_app_on_win64     = [string]$_.enable32bitapponwin64
@@ -13,7 +13,8 @@ Get-WebConfiguration -Filter '/system.applicationHost/applicationPools/add' | % 
     pass_anonymous_token          = [string]$_.passanonymoustoken
     start_mode                    = [string]$_.startmode
     queue_length                  = [string]$_.queuelength
-    
+    environment_variables         = [string]$_.environment_variables
+
     cpu_action                       = [string]$_.cpu.action
     cpu_limit                        = [string]$_.cpu.limit
     cpu_reset_interval               = [string]$_.cpu.resetinterval
