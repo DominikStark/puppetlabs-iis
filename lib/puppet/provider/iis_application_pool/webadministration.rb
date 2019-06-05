@@ -88,6 +88,30 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
     end
   end
 
+  def self.parse_environment_variables(config)
+    environment_variables_hash = {}
+    splitted_config = config.split('[environmentVariables]')
+    if splitted_config.count > 1
+      key = nil
+      value = nil
+      splitted_config[1].each_line do |line|
+        if line.include? '[add]'
+          if key != nil
+            environment_variables_hash[key] = value
+          end
+        end
+        if line.include? 'name:"'
+          key = line.split('name:"')[1].strip
+        end
+        if line.include? 'value:"'
+          value = line.split('value:"')[1].strip
+        end
+      end
+      environment_variables_hash[key] = value
+    end
+    return environment_variables_hash
+  end
+
   def self.instances
     inst_cmd = ps_script_content('_getapppools', @resource)
     result   = run(inst_cmd)
@@ -95,6 +119,9 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
 
     pool_json = self.parse_json_result(result[:stdout])
     return [] if pool_json.nil?
+
+    result = run("C:\\Windows\\system32\\inetsrv\\AppCmd.exe list AppPool \"#{@resource[:name]}\" /text:*")
+    pool_environment_variables = self.parse_environment_variables(result[:stdout])
 
     pool_json.collect do |pool|
       pool_hash = {}
@@ -112,7 +139,7 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
       pool_hash[:pass_anonymous_token]          = pool['pass_anonymous_token'].to_s.downcase
       pool_hash[:start_mode]                    = pool['start_mode']
       pool_hash[:queue_length]                  = pool['queue_length']
-      pool_hash[:environment_variables]         = {"a"=>"a", "b"=>"b"}
+      pool_hash[:environment_variables]         = pool_environment_variables
 
       pool_hash[:cpu_action]                       = pool['cpu_action']
       pool_hash[:cpu_limit]                        = pool['cpu_limit']
