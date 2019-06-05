@@ -96,15 +96,15 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
       value = nil
       splitted_config[1].each_line do |line|
         if line.include? '[add]'
-          if key != nil
+          unless key.nil?
             environment_variables_hash[key] = value
           end
         end
         if line.include? 'name:"'
-          key = line.split('name:"')[1].strip
+          key = line.split('name:"')[1].strip.chomp("\"")
         end
         if line.include? 'value:"'
-          value = line.split('value:"')[1].strip
+          value = line.split('value:"')[1].strip.chomp("\"")
         end
       end
       environment_variables_hash[key] = value
