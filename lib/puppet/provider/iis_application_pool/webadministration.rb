@@ -107,6 +107,9 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
           environment_variables_started = false
         end
       end
+      if line.include? 'APPPOOL.NAME:"'
+        app_pool_name = line.split('APPPOOL.NAME:"')[1].strip.chomp("\"")
+      end
       if line.include? '[environmentVariables]'
         environment_variables_started = true
       end
