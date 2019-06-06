@@ -98,6 +98,7 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
     environment_variables_started = false
     config.each_line do |line|
       Puppet.debug "#{line}"
+      line = line.strip
       if line == 'APPPOOL'
         Puppet.debug "hit new apppool"
         unless app_pool_name.nil?
@@ -130,7 +131,7 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
 
     result = run("C:\\Windows\\system32\\inetsrv\\AppCmd.exe list AppPool /text:*")
     Puppet.debug "result #{result}"
-    pool_environment_variables = self.parse_environment_variables(result[:stdout])
+    pool_environment_variables = self.parse_environment_variables(result[:native_stdout])
 
     pool_json.collect do |pool|
       pool_hash = {}
