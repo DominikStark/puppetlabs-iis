@@ -121,6 +121,10 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
         environment_variables_per_pool[key] = value
       end
     end
+    unless app_pool_name.nil?
+      environment_variables_hash[app_pool_name] = environment_variables_per_pool
+    end
+    Puppet.debug "#{environment_variables_hash}"
     return environment_variables_hash
   end
 
