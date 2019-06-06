@@ -91,25 +91,31 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
   def self.parse_environment_variables(config)
     Puppet.debug "config #{config}"
     environment_variables_hash = {}
-    splitted_config = config.split('[environmentVariables]')
-    Puppet.debug "splitted_config #{splitted_config}"
-    if splitted_config.count > 1
-      key = nil
-      value = nil
-      splitted_config[1].each_line do |line|
-        if line.include? '[add]'
-          unless key.nil?
-            environment_variables_hash[key] = value
-          end
-        end
-        if line.include? 'name:"'
-          key = line.split('name:"')[1].strip.chomp("\"")
-        end
-        if line.include? 'value:"'
-          value = line.split('value:"')[1].strip.chomp("\"")
+    app_pool_name = nil
+    key = nil
+    value = nil
+    environment_variables_per_pool = {}
+    environment_variables_started = false
+    config.each_line do |line|
+      Puppet.debug "#{line}"
+      if line == 'APPPOOL'
+        Puppet.debug "hit new apppool"
+        unless app_pool_name.nil?
+          environment_variables_hash[app_pool_name] = environment_variables_per_pool
+          environment_variables_per_pool = {}
+          environment_variables_started = false
         end
       end
-      environment_variables_hash[key] = value
+      if line.include? '[environmentVariables]'
+        environment_variables_started = true
+      end
+      if line.include? 'name:"' and environment_variables_started
+        key = line.split('name:"')[1].strip.chomp("\"")
+      end
+      if line.include? 'value:"' and environment_variables_started
+        value = line.split('value:"')[1].strip.chomp("\"")
+        environment_variables_per_pool[key] = value
+      end
     end
     return environment_variables_hash
   end
@@ -122,7 +128,8 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
     pool_json = self.parse_json_result(result[:stdout])
     return [] if pool_json.nil?
 
-    result = run("C:\\Windows\\system32\\inetsrv\\AppCmd.exe list AppPool \"#{@resource[:name]}\" /text:*")
+    result = run("C:\\Windows\\system32\\inetsrv\\AppCmd.exe list AppPool /text:*")
+    Puppet.debug "result #{result}"
     pool_environment_variables = self.parse_environment_variables(result[:stdout])
 
     pool_json.collect do |pool|
@@ -141,7 +148,7 @@ Puppet::Type.type(:iis_application_pool).provide(:webadministration, parent: Pup
       pool_hash[:pass_anonymous_token]          = pool['pass_anonymous_token'].to_s.downcase
       pool_hash[:start_mode]                    = pool['start_mode']
       pool_hash[:queue_length]                  = pool['queue_length']
-      pool_hash[:environment_variables]         = pool_environment_variables
+      pool_hash[:environment_variables]         = pool_environment_variables[pool['name']]
 
       pool_hash[:cpu_action]                       = pool['cpu_action']
       pool_hash[:cpu_limit]                        = pool['cpu_limit']
